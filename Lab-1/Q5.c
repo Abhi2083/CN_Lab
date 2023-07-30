@@ -1,29 +1,47 @@
 #include <stdio.h>
-int main()
-{
+
+int main() {
     int a;
     printf("Enter a number: ");
     scanf("%d", &a);
-    int lsb = a & 256;
-    printf("Extracted byte from LSB of the Number: %d", lsb);
 
-    printf("\n\nMemory representation of number\n");
-    printf("\n------------------------\n");
-    printf("Memory Address\t->\tValue");
-    printf("\n------------------------\n"); 
-    int *ptr = &a;
-    char *ch = (char *)ptr;
-    for (int i = 0; i < 4; i++)
-    {
-        printf("%d\t\t->\t%d\n", ch, *ch);
+    int lsb = a & 0xFF;
+    printf("Extracted byte from LSB of the Number: %d\n\n", lsb);
+
+    printf("Memory representation of number\n");
+    printf("------------------------\n");
+    printf("Memory Address\t->\tValue\n");
+    printf("------------------------\n");
+    char *ch = (char *)&a;
+    for (int i = 0; i < sizeof(int); i++) {
+        printf("%p\t->\t%d\n", (void *)ch, *ch);
         ch++;
     }
-    printf("\nThe LSB of the number is stored in the lowest memory address\nHence the machine is little Endian\n");
-    printf("\nThe machine is coverted to big Endian now\nMemory representation of the number\n");
-    printf("\n------------------------\n");
-    printf("Memory Address\t->\tValue");
-    printf("\n------------------------\n");
 
-    int num;
-    *ch = (char *)ptr;
+    int endianness_test = 1;
+    if (*((char *)&endianness_test) == 1) {
+        printf("\nThe LSB of the number is stored in the lowest memory address\nHence the machine is little Endian\n");
+        printf("\nConverting the machine to big Endian\n");
+        ch = (char *)&a;
+        char temp;
+        for (int i = 0; i < sizeof(int) / 2; i++) {
+            temp = ch[i];
+            ch[i] = ch[sizeof(int) - 1 - i];
+            ch[sizeof(int) - 1 - i] = temp;
+        }
+    } else {
+        printf("\nThe MSB of the number is stored in the lowest memory address\nHence the machine is big Endian\n");
+    }
+
+    printf("\nMemory representation of the number after conversion\n");
+    printf("------------------------\n");
+    printf("Memory Address\t->\tValue\n");
+    printf("------------------------\n");
+    ch = (char *)&a;
+    for (int i = 0; i < sizeof(int); i++) {
+        printf("%p\t->\t%d\n", (void *)ch, *ch);
+        ch++;
+    }
+
+    return 0;
 }
